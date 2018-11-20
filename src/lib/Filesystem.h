@@ -8,13 +8,14 @@
 #include <fuse.h>
 
 class Filesystem {
-  BlockManager& blocks;
   INodeManager& inodes;
+  BlockManager& blocks;
 
 public:
-  Filesystem(BlockManager& b, INodeManager& i): blocks(b), inodes(i) {
-    // All done.
-  }
+  static Filesystem* init(int argc, char** argv, bool mkfs);
+
+public:
+  Filesystem(INodeManager& i, BlockManager& b);
 
   // FUSE Operations:
   int chmod(const char*, mode_t);

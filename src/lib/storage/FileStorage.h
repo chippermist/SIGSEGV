@@ -5,8 +5,9 @@
 
 class FileStorage: public Storage {
   std::fstream file;
+  uint64_t     size;
 public:
-  FileStorage(const char* filename);
+  FileStorage(const char* filename, uint64_t nblocks);
   ~FileStorage();
 
   void get(Block::ID id, Block& dst);

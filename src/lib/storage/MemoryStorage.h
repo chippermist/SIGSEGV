@@ -3,8 +3,8 @@
 #include "../Storage.h"
 
 class MemoryStorage: public Storage {
-  uint64_t size;
   char*    data;
+  uint64_t size;
 public:
   MemoryStorage(uint64_t nblocks);
   ~MemoryStorage();

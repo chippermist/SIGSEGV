@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 MemoryStorage::MemoryStorage(uint64_t nblocks) {
-  data = new char[nblocks * 4096];
+  data = new char[nblocks * Block::BLOCK_SIZE];
   size = nblocks;
 }
 
@@ -17,8 +17,8 @@ void MemoryStorage::get(Block::ID id, Block& dst) {
     throw std::length_error("Block read out of range.");
   }
 
-  const char* src = &data[id * 4096];
-  std::memcpy(dst.data, src, 4096);
+  const char* src = &data[id * Block::BLOCK_SIZE];
+  std::memcpy(dst.data, src, Block::BLOCK_SIZE);
 }
 
 void MemoryStorage::set(Block::ID id, const Block& src) {
@@ -26,6 +26,6 @@ void MemoryStorage::set(Block::ID id, const Block& src) {
     throw std::length_error("Block write out of range.");
   }
 
-  char* dst = &data[id * 4096];
-  std::memcpy(dst, src.data, 4096);
+  char* dst = &data[id * Block::BLOCK_SIZE];
+  std::memcpy(dst, src.data, Block::BLOCK_SIZE);
 }
