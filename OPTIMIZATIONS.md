@@ -6,7 +6,7 @@ As we work through the project, we discover that there are many areas in the fil
 
 ### INode Management
 
-Currently, reserve() will read in the INode block and find a free one. We could have reserve take in a Block * or INode *, so that after reserve finds its free INode, it reads into the user's pointer instead of making the user re-read the INode from disk.
+Currently, reserve() will read in the INode block and find a free one. We could have reserve take in a Block\* or INode\*, so that after reserve finds its free INode, it reads into the user's pointer instead of making the user re-read the INode from disk.
 
 ### File Writing
 

@@ -94,7 +94,7 @@ int Filesystem::mount(char* program, fuse_operations* ops) {
   char f[] = "-f"; // Run in the foreground.
   char o[] = "-o"; // Other options
   char p[] = "default_permissions"; // Defer permissions checks to kernel
-  char r[] = "allow_root"; // Only allow root and user to access files
+  char r[] = "allow_other"; // Allow all users to (try to) access files
 
   int argc = 0;
   char* argv[12] = {0};

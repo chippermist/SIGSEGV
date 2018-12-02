@@ -1,35 +1,61 @@
 #! /bin/bash
 
-# Make a test folder:
-mkdir -p "tmp/tests/mnt"
+DFILE=""
+FSDIR=""
+MOUNT=""
 
-# Test writing to memory:
-bin/fuse -n 1024 "tmp/tests/mnt" &> "tmp/tests/memory.log" &
-pid=$!
+usage() {
+  echo << EOS 1>&2
+USAGE: $0 [options] [mount-point]
+  -f <diskfile>  Use <diskfile> for storage.
+  -m             Mount and unmount the filesystem.
+EOS
+}
 
-bin/test-syscalls "$(pwd)/tmp/tests/mnt"
-status=$?
+while getopts "hmf:" opt; do
+  case "$opt" in
+  m) MOUNT="true" ;;
+  f) DFILE="-f $OPTARG" ;;
+  h|\?)
+    usage
+    exit 0
+    ;;
+  esac
+done
 
-kill "$pid"
-sleep 0.1
-kill -9 "$pid" 2> /dev/null
-
-if [ $status -ne 0 ]; then
+shift $(($OPTIND - 1))
+if [ $# -ne 1 ]; then
+  echo "No mount point given!" 1>&2
+  usage
   exit 1
 fi
 
-# Test writing to a test file:
-bin/mkfs -n 1024 -f "tmp/tests/disk"
-bin/fuse -n 1024 -f "tmp/tests/disk" "tmp/tests/mnt" &> "tmp/tests/file.log" &
-pid=$!
+FSDIR="$1"
+if [ "$MOUNT" = "true" ]; then
+  mkdir -p "tmp"
+  mkdir -p "$FSDIR"
+  bin/fuse -n 1024 $DFILE "$FSDIR" &> "tmp/test.log" &
+  FSPID=$!
+
+  sleep 0.1
+  if ! kill -0 "$!"; then
+    echo "File system died on startup!" 1>&2
+    echo "Filesystem logs follow:" 1>&2
+    echo 1>&2
+    cat  "tmp/test.log"
+    exit  1
+  fi
+fi
 
 bin/test-syscalls "$(pwd)/tmp/tests/mnt"
 status=$?
 
-kill "$pid"
-sleep 0.1
-kill -9 "$pid" 2> /dev/null
+if [ "$MOUNT" = "true" ]; then
+  kill "$FSPID"; &> /dev/null
+  sleep 0.1
+  kill -9 "$FSPID" &> /dev/null
+fi
 
 if [ $status -ne 0 ]; then
-  exit 1
+  exit "$status"
 fi
